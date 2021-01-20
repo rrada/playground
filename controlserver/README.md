@@ -4,6 +4,10 @@ Very simple implementation of server and remote communication where
  * `server` is manager for many remotes
  * `remote`s are sending `ping` packets in defined interval and telling the server about own state 
 
+Server
+ * is keeping track about all remotes that are sending ping
+ * periodically clean all remotes declared as 'stale'
+
 Remote states:
  * IDLE
  * WORKING
@@ -42,3 +46,8 @@ Remote state WORKING || desc: tskknwlcuhqhbvoesory              │    Job offer
 Removing stale remote: 173683416947055                          │
 ^C                                                              │
 ```
+
+TODO:
+ * [ ] implement console with prompt
+    * [ ] getting information about remote(s)
+    * [ ] sending offer to specific remote(s) 

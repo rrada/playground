@@ -25,8 +25,6 @@ SERVER_HOST = '0.0.0.0'
 SERVER_PORT = 10000
 SERVER_ID = 0
 
-CONSOLE_SOCK = '/tmp/console.sock'
-
 BUFFER_SIZE = 1024
 CLEANUP_INTERNVAL = 10
 REMOTE_LIFETIME_MAX = 10
@@ -93,7 +91,6 @@ class ControlServer(ThreadingMixIn, UDPServer):
     def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True):
         UDPServer.__init__(self, server_address, RequestHandlerClass, bind_and_activate)
 
-        self.console = None
 
     def add_remote(self, id, addr, port, state):
         """Adds or updates the remote"""
@@ -146,11 +143,12 @@ class ControlServer(ThreadingMixIn, UDPServer):
 
         # just testing communication sent to client in 1 s interval
         if time.time() - self.last_test_send > 1:
-            if self.is_remote_alive(173683416947055) and self.is_remote_idle(173683416947055):
-                sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                pack = struct.pack(HEADER_FMT, SERVER_ID, EMsgType.JOB_OFFER, "Job offer from server".encode('utf-8'))
-                sock.sendto(pack, (self.remotes[173683416947055]['addr'], self.remotes[173683416947055]['port']))
-                sock.close()
+            for remote in self.remotes.keys():
+                if self.is_remote_alive(remote) and self.is_remote_idle(remote):
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    pack = struct.pack(HEADER_FMT, SERVER_ID, EMsgType.JOB_OFFER, "Job offer from server".encode('utf-8'))
+                    sock.sendto(pack, (self.remotes[remote]['addr'], self.remotes[remote]['port']))
+                    sock.close()
             self.last_test_send = time.time()
 
     def server_activate(self):
